@@ -1,179 +1,164 @@
+import { useState, useEffect } from 'react';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
+import ImagePopup from './ImagePopup';
+import PopupWithForm from './PopupWithForm';
+import api from '../utils/Api';
 
 function App() {
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+
+  const [userName, setUserName] = useState('');
+  const [userDescription, setUserDescription] = useState('');
+  const [userAvatar, setUserAvatar] = useState('');
+
+  const [selectedCard, setSelectedCard] = useState('');
+
+  const [cards, setCards] = useState([]);
+
+  const closeAllPopups = () => {
+    setIsEditProfilePopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsEditAvatarPopupOpen(false);
+    setSelectedCard('');
+  };
+
+  useEffect(() => {
+    function handleEscClose(event) {
+      if (event.key === 'Escape') {
+        closeAllPopups();
+      }
+    }
+    document.addEventListener('keyup', handleEscClose);
+
+    return () => {
+      document.removeEventListener('keyup', handleEscClose);
+    };
+  }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen]);
+
+  useEffect(() => {
+    Promise.all([api.getInitialCards(), api.getUserInfo()])
+      .then(([resCards, resUser]) => {
+        setUserName(resUser.name);
+        setUserDescription(resUser.about);
+        setUserAvatar(resUser.avatar);
+
+        const cardList = resCards.map((card) => card);
+        setCards(cardList);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+
   return (
     <div className="body">
       <div className="page">
         <Header />
         <Main
-          handleEditAvatarClick={() => {
-            const PopupEditAvatar = document.querySelector(
-              '.popup_type_edit-avatar'
-            );
-            PopupEditAvatar.classList.add('popup_opened');
+          onEditAvatar={() => {
+            setIsEditAvatarPopupOpen(!isEditAvatarPopupOpen);
           }}
-          handleEditProfileClick={() => {
-            const PopupEditProfile = document.querySelector(
-              '.popup_type_edit-profile'
-            );
-            PopupEditProfile.classList.add('popup_opened');
+          onEditProfile={() => {
+            setIsEditProfilePopupOpen(!isEditProfilePopupOpen);
           }}
-          handleAddPlaceClick={() => {
-            const PopupAddPlace = document.querySelector(
-              '.popup_type_add-place'
-            );
-            PopupAddPlace.classList.add('popup_opened');
+          onAddPlace={() => {
+            setIsAddPlacePopupOpen(!isAddPlacePopupOpen);
+          }}
+          userName={userName}
+          userDescription={userDescription}
+          userAvatar={userAvatar}
+          cards={cards}
+          onCardClick={(link) => {
+            setSelectedCard(link);
           }}
         />
         <Footer />
       </div>
-      <div className="popup popup_type_edit-profile">
-        <div className="popup__container popup__overlay">
-          <button
-            className="popup__btn-close"
-            type="button"
-            aria-label="закрыть"
-          ></button>
-          <h2 className="popup__title">Редактировать профиль</h2>
-          <form className="popup__form" name="edit-profile" noValidate>
-            <input
-              className="popup__text"
-              type="text"
-              name="name"
-              id="popup-name"
-              minLength="2"
-              maxLength="40"
-              required
-            />
-            <span className="popup__text-error popup-name-error"></span>
-            <input
-              className="popup__text"
-              type="text"
-              name="about"
-              id="popup-profession"
-              minLength="2"
-              maxLength="200"
-              required
-            />
-            <span className="popup__text-error popup-profession-error"></span>
-            <button className="popup__submit" type="submit">
-              Сохранить
-            </button>
-          </form>
-        </div>
-      </div>
-      <div className="popup popup_type_add-place">
-        <div className="popup__container popup__overlay">
-          <button
-            className="popup__btn-close"
-            type="button"
-            aria-label="закрыть"
-          ></button>
-          <h2 className="popup__title">Новое место</h2>
-          <form className="popup__form" name="add-place" noValidate>
-            <div className="popup__item">
-              <input
-                className="popup__text"
-                type="text"
-                name="popup-place"
-                id="popup-place"
-                placeholder="Название"
-                minLength="2"
-                maxLength="30"
-                required
-              />
-              <span className="popup__text-error popup-place-error"></span>
-            </div>
-            <div className="popup__item">
-              <input
-                className="popup__text"
-                type="url"
-                name="popup-link"
-                id="popup-link"
-                placeholder="Ссылка на картинку"
-                required
-              />
-              <span className="popup__text-error popup-link-error"></span>
-            </div>
-            <button className="popup__submit" type="submit">
-              Создать
-            </button>
-          </form>
-        </div>
-      </div>
-      <div className="popup popup_fullscreen-photo">
-        <div className="popup__container-fullscreen-photo popup__overlay">
-          <button
-            className="popup__btn-close"
-            type="button"
-            aria-label="закрыть"
-          ></button>
-          <img className="popup__img" />
-          <p className="popup__caption-img"></p>
-        </div>
-      </div>
-      <div className="popup popup_type_delete-card">
-        <div className="popup__container popup__overlay">
-          <button
-            className="popup__btn-close"
-            type="button"
-            aria-label="закрыть"
-          ></button>
-          <h2 className="popup__title popup__title_delete-card">Вы уверены?</h2>
-          <button className="popup__submit" type="submit">
-            Да
-          </button>
-        </div>
-      </div>
-      <div className="popup popup_type_edit-avatar">
-        <div className="popup__container popup__overlay">
-          <button
-            className="popup__btn-close"
-            type="button"
-            aria-label="закрыть"
-          ></button>
-          <h2 className="popup__title">Обновить аватар</h2>
-          <form className="popup__form" name="edit-avatar" noValidate>
-            <div className="popup__item">
-              <input
-                className="popup__text"
-                type="url"
-                name="link"
-                id="link"
-                placeholder="Ссылка на картинку"
-                required
-              />
-              <span className="popup__text-error link-error"></span>
-            </div>
-            <button className="popup__submit" type="submit">
-              Сохранить
-            </button>
-          </form>
-        </div>
-      </div>
-      <template id="card-template">
-        <div className="gallery__element">
-          <button
-            className="btn-trash"
-            type="button"
-            aria-label="удалить"
-          ></button>
-          <img className="gallery__img" />
-          <div className="gallery__info">
-            <h2 className="gallery__title"></h2>
-            <div className="gallery__like-wrapper">
-              <button
-                className="btn-like"
-                type="button"
-                aria-label="лайкнуть"
-              ></button>
-              <span className="gallery__like-counter">0</span>
-            </div>
-          </div>
-        </div>
-      </template>
+      <PopupWithForm
+        title="Редактировать профиль"
+        name="edit-profile"
+        buttonText="Сохранить"
+        isOpen={isEditProfilePopupOpen ? 'popup_opened' : ''}
+        onClose={closeAllPopups}
+      >
+        <input
+          className="popup__text"
+          type="text"
+          name="name"
+          id="popup-name"
+          minLength="2"
+          maxLength="40"
+          required
+        />
+        <span className="popup__text-error popup-name-error"></span>
+        <input
+          className="popup__text"
+          type="text"
+          name="about"
+          id="popup-profession"
+          minLength="2"
+          maxLength="200"
+          required
+        />
+        <span className="popup__text-error popup-profession-error"></span>
+      </PopupWithForm>
+      <PopupWithForm
+        title="Новое место"
+        name="add-place"
+        buttonText="Создать"
+        isOpen={isAddPlacePopupOpen ? 'popup_opened' : ''}
+        onClose={closeAllPopups}
+      >
+        <input
+          className="popup__text"
+          type="text"
+          name="popup-place"
+          id="popup-place"
+          placeholder="Название"
+          minLength="2"
+          maxLength="30"
+          required
+        />
+        <span className="popup__text-error popup-place-error"></span>
+        <input
+          className="popup__text"
+          type="url"
+          name="popup-link"
+          id="popup-link"
+          placeholder="Ссылка на картинку"
+          required
+        />
+        <span className="popup__text-error popup-link-error"></span>
+      </PopupWithForm>
+      <PopupWithForm
+        title="Вы уверены?"
+        name="delete-card"
+        buttonText="Да"
+      ></PopupWithForm>
+      <PopupWithForm
+        title="Обновить аватар"
+        name="edit-avatar"
+        buttonText="Сохранить"
+        isOpen={isEditAvatarPopupOpen ? 'popup_opened' : ''}
+        onClose={closeAllPopups}
+      >
+        <input
+          className="popup__text"
+          type="url"
+          name="link"
+          id="link"
+          placeholder="Ссылка на картинку"
+          required
+        />
+        <span className="popup__text-error link-error"></span>
+      </PopupWithForm>
+      <ImagePopup
+        isOpen={selectedCard ? 'popup_opened' : ''}
+        selectedCard={selectedCard}
+        onClose={closeAllPopups}
+      />
     </div>
   );
 }

@@ -1,39 +1,47 @@
+import Card from './Card';
+
 function Main({
-  handleEditAvatarClick,
-  handleEditProfileClick,
-  handleAddPlaceClick,
+  onCardClick,
+  onEditAvatar,
+  onEditProfile,
+  onAddPlace,
+  userName,
+  userDescription,
+  userAvatar,
+  cards,
 }) {
   return (
     <main className="main">
       <section className="profile">
-        <div
-          onClick={handleEditAvatarClick}
-          className="profile__avatar-wrapper"
-        >
-          <img
-            className="profile__avatar"
-            src="images/cuzco-avatar.jpg"
-            alt="аватар"
-          />
+        <div onClick={onEditAvatar} className="profile__avatar-wrapper">
+          <img className="profile__avatar" src={userAvatar} alt="аватар" />
         </div>
         <div className="profile__info">
-          <h1 className="profile__name"></h1>
+          <h1 className="profile__name">{userName}</h1>
           <button
             className="profile__edit-button"
             type="button"
             aria-label="исправить"
-            onClick={handleEditProfileClick}
+            onClick={onEditProfile}
           ></button>
-          <p className="profile__profession"></p>
+          <p className="profile__profession">{userDescription}</p>
         </div>
         <button
           className="profile__add-button"
           type="button"
           aria-label="добавить"
-          onClick={handleAddPlaceClick}
+          onClick={onAddPlace}
         ></button>
       </section>
-      <section className="gallery"></section>
+      <section className="gallery">
+        {cards.length ? (
+          cards.map((card) => (
+            <Card key={card._id} {...card} onCardClick={onCardClick} />
+          ))
+        ) : (
+          <p> Картинок нет</p>
+        )}
+      </section>
     </main>
   );
 }
