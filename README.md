@@ -17,5 +17,3 @@ _use functional components_
 \_After you can open the project with npm start
 
 # Link on gh-pages :
-
-https://vladtolmachev.github.io/mesto/
