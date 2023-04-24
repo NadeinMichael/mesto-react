@@ -15,7 +15,7 @@ function App() {
   const [userDescription, setUserDescription] = useState('');
   const [userAvatar, setUserAvatar] = useState('');
 
-  const [selectedCard, setSelectedCard] = useState('');
+  const [selectedCard, setSelectedCard] = useState(null);
 
   const [cards, setCards] = useState([]);
 
@@ -23,8 +23,14 @@ function App() {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
-    setSelectedCard('');
+    setSelectedCard(null);
   };
+
+  const IsAnyPopupOpen =
+    isEditProfilePopupOpen ||
+    isAddPlacePopupOpen ||
+    isEditAvatarPopupOpen ||
+    selectedCard;
 
   useEffect(() => {
     function handleEscClose(event) {
@@ -32,12 +38,14 @@ function App() {
         closeAllPopups();
       }
     }
-    document.addEventListener('keyup', handleEscClose);
+    if (IsAnyPopupOpen) {
+      document.addEventListener('keyup', handleEscClose);
+    }
 
     return () => {
       document.removeEventListener('keyup', handleEscClose);
     };
-  }, [isEditProfilePopupOpen, isAddPlacePopupOpen, isEditAvatarPopupOpen]);
+  }, [IsAnyPopupOpen]);
 
   useEffect(() => {
     Promise.all([api.getInitialCards(), api.getUserInfo()])
@@ -79,8 +87,7 @@ function App() {
       <PopupWithForm
         title="Редактировать профиль"
         name="edit-profile"
-        buttonText="Сохранить"
-        isOpen={isEditProfilePopupOpen ? 'popup_opened' : ''}
+        isOpen={isEditProfilePopupOpen}
         onClose={closeAllPopups}
       >
         <input
@@ -90,6 +97,7 @@ function App() {
           id="popup-name"
           minLength="2"
           maxLength="40"
+          placeholder="Введите имя"
           required
         />
         <span className="popup__text-error popup-name-error"></span>
@@ -100,6 +108,7 @@ function App() {
           id="popup-profession"
           minLength="2"
           maxLength="200"
+          placeholder="Введите профессию"
           required
         />
         <span className="popup__text-error popup-profession-error"></span>
@@ -108,7 +117,7 @@ function App() {
         title="Новое место"
         name="add-place"
         buttonText="Создать"
-        isOpen={isAddPlacePopupOpen ? 'popup_opened' : ''}
+        isOpen={isAddPlacePopupOpen}
         onClose={closeAllPopups}
       >
         <input
@@ -140,8 +149,7 @@ function App() {
       <PopupWithForm
         title="Обновить аватар"
         name="edit-avatar"
-        buttonText="Сохранить"
-        isOpen={isEditAvatarPopupOpen ? 'popup_opened' : ''}
+        isOpen={isEditAvatarPopupOpen}
         onClose={closeAllPopups}
       >
         <input
@@ -155,7 +163,7 @@ function App() {
         <span className="popup__text-error link-error"></span>
       </PopupWithForm>
       <ImagePopup
-        isOpen={selectedCard ? 'popup_opened' : ''}
+        isOpen={selectedCard}
         selectedCard={selectedCard}
         onClose={closeAllPopups}
       />

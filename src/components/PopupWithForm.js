@@ -1,6 +1,6 @@
 function PopupWithForm({ title, name, buttonText, isOpen, onClose, children }) {
   return (
-    <div className={`popup popup_type_${name} ${isOpen}`} onClick={onClose}>
+    <div className={`popup ${isOpen && 'popup_opened'}`} onClick={onClose}>
       <div
         className="popup__container popup__overlay"
         onClick={(e) => e.stopPropagation()}
@@ -15,7 +15,7 @@ function PopupWithForm({ title, name, buttonText, isOpen, onClose, children }) {
         <form className="popup__form" name={name} noValidate>
           {children}
           <button className="popup__submit" type="submit">
-            {buttonText}
+            {buttonText || 'Сохранить'}
           </button>
         </form>
       </div>
