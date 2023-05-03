@@ -14,7 +14,7 @@ function ImagePopup({ isOpen, selectedCard, onClose }) {
           aria-label="закрыть"
           onClick={onClose}
         ></button>
-        {selectedCard && <img className="popup__img" src={selectedCard.link} />}
+        {selectedCard && <img className="popup__img" src={selectedCard} />}
         <p className="popup__caption-img"></p>
       </div>
     </div>

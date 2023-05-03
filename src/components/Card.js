@@ -1,20 +1,36 @@
-function Card({ name, link, likes, onCardClick }) {
+import { useContext } from 'react';
+import CurrentUserContext from '../contexts/CurrentUserContext';
+
+function Card({ card, onCardClick, onCardLike }) {
   function handleCardClick() {
-    onCardClick({ link });
+    onCardClick(card.link);
   }
+
+  function handleLikeClick() {
+    onCardLike(card);
+  }
+
+  const currentUser = useContext(CurrentUserContext);
+  const isOwn = card.owner._id === currentUser._id;
+  const isLiked = card.likes.some((i) => i._id === currentUser._id);
+  const cardLikeButtonClassName = `btn-like ${isLiked && 'btn-like_active'}`;
+
   return (
     <div className="gallery__element">
-      <button className="btn-trash" type="button" aria-label="удалить"></button>
-      <img className="gallery__img" src={link} onClick={handleCardClick} />
+      {isOwn && (
+        <button className="btn-trash" type="button" aria-label="удалить" />
+      )}
+      <img className="gallery__img" src={card.link} onClick={handleCardClick} />
       <div className="gallery__info">
-        <h2 className="gallery__title">{name}</h2>
+        <h2 className="gallery__title">{card.name}</h2>
         <div className="gallery__like-wrapper">
           <button
-            className="btn-like"
+            className={cardLikeButtonClassName}
             type="button"
             aria-label="лайкнуть"
-          ></button>
-          <span className="gallery__like-counter">{likes.length}</span>
+            onClick={handleLikeClick}
+          />
+          <span className="gallery__like-counter">{card.likes.length}</span>
         </div>
       </div>
     </div>
