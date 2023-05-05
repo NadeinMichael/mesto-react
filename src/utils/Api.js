@@ -23,13 +23,13 @@ class Api {
     }).then(this._checkValidAnswer);
   }
 
-  editProfile({ name, job }) {
+  editProfile({ name, about }) {
     return fetch(`${this._baseUrl}/users/me`, {
       method: 'PATCH',
       headers: this._headers,
       body: JSON.stringify({
-        name: name,
-        about: job,
+        name,
+        about,
       }),
     }).then(this._checkValidAnswer);
   }

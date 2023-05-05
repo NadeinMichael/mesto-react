@@ -1,12 +1,33 @@
 import PopupWithForm from './PopupWithForm';
+import { useState, useEffect, useContext } from 'react';
+import CurrentUserContext from '../../contexts/CurrentUserContext';
 
-function EditProfilePopup({ isOpen, onClose }) {
+function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
+  const currentUser = useContext(CurrentUserContext);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    setName(currentUser.name);
+    setDescription(currentUser.about);
+  }, [currentUser]);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    onUpdateUser({
+      name,
+      about: description,
+    });
+  }
+
   return (
     <PopupWithForm
       title="Редактировать профиль"
       name="edit-profile"
       isOpen={isOpen}
       onClose={onClose}
+      onSubmit={handleSubmit}
     >
       <input
         className="popup__text"
@@ -15,7 +36,8 @@ function EditProfilePopup({ isOpen, onClose }) {
         id="popup-name"
         minLength="2"
         maxLength="40"
-        placeholder="Введите имя"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
         required
       />
       <span className="popup__text-error popup-name-error"></span>
@@ -26,7 +48,8 @@ function EditProfilePopup({ isOpen, onClose }) {
         id="popup-profession"
         minLength="2"
         maxLength="200"
-        placeholder="Введите профессию"
+        value={description}
+        onChange={(event) => setDescription(event.target.value)}
         required
       />
       <span className="popup__text-error popup-profession-error"></span>
