@@ -3,9 +3,10 @@ import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
 import ImagePopup from './ImagePopup';
-import PopupWithForm from './PopupWithForm';
+import PopupWithForm from './popups/PopupWithForm';
 import api from '../utils/Api';
 import CurrentUserContext from '../contexts/CurrentUserContext';
+import EditProfilePopup from './popups/EditProfilePopup';
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -40,9 +41,23 @@ function App() {
   function handleCardLike(card) {
     const isLiked = card.likes.some((i) => i._id === currentUser._id);
 
-    api.changeLikeCardStatus(card._id, !isLiked).then((newCard) => {
-      setCards((cards) => cards.map((c) => (c._id === card._id ? newCard : c)));
-    });
+    api
+      .changeLikeCardStatus(card._id, !isLiked)
+      .then((newCard) => {
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
+        );
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleCardDelete(id) {
+    api
+      .deleteCard(id)
+      .then(() => {
+        setCards((state) => state.filter((c) => c._id !== id));
+      })
+      .catch((err) => console.log(err));
   }
 
   useEffect(() => {
@@ -92,38 +107,16 @@ function App() {
             onCardLike={(card) => {
               handleCardLike(card);
             }}
+            onCardDelete={(id) => {
+              handleCardDelete(id);
+            }}
           />
           <Footer />
         </div>
-        <PopupWithForm
-          title="Редактировать профиль"
-          name="edit-profile"
+        <EditProfilePopup
           isOpen={isEditProfilePopupOpen}
           onClose={closeAllPopups}
-        >
-          <input
-            className="popup__text"
-            type="text"
-            name="name"
-            id="popup-name"
-            minLength="2"
-            maxLength="40"
-            placeholder="Введите имя"
-            required
-          />
-          <span className="popup__text-error popup-name-error"></span>
-          <input
-            className="popup__text"
-            type="text"
-            name="about"
-            id="popup-profession"
-            minLength="2"
-            maxLength="200"
-            placeholder="Введите профессию"
-            required
-          />
-          <span className="popup__text-error popup-profession-error"></span>
-        </PopupWithForm>
+        />
         <PopupWithForm
           title="Новое место"
           name="add-place"

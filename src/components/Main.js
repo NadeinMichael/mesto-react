@@ -5,6 +5,7 @@ import CurrentUserContext from '../contexts/CurrentUserContext';
 function Main({
   onCardClick,
   onCardLike,
+  onCardDelete,
   onEditAvatar,
   onEditProfile,
   onAddPlace,
@@ -47,6 +48,7 @@ function Main({
               card={card}
               onCardClick={onCardClick}
               onCardLike={onCardLike}
+              onCardDelete={onCardDelete}
             />
           ))
         ) : (

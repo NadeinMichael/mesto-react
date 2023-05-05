@@ -1,13 +1,17 @@
 import { useContext } from 'react';
 import CurrentUserContext from '../contexts/CurrentUserContext';
 
-function Card({ card, onCardClick, onCardLike }) {
+function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   function handleCardClick() {
     onCardClick(card.link);
   }
 
   function handleLikeClick() {
     onCardLike(card);
+  }
+
+  function handleDeleteClick() {
+    onCardDelete(card._id);
   }
 
   const currentUser = useContext(CurrentUserContext);
@@ -18,7 +22,12 @@ function Card({ card, onCardClick, onCardLike }) {
   return (
     <div className="gallery__element">
       {isOwn && (
-        <button className="btn-trash" type="button" aria-label="удалить" />
+        <button
+          className="btn-trash"
+          type="button"
+          aria-label="удалить"
+          onClick={handleDeleteClick}
+        />
       )}
       <img className="gallery__img" src={card.link} onClick={handleCardClick} />
       <div className="gallery__info">
