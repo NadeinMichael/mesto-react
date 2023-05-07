@@ -5,10 +5,11 @@ import CurrentUserContext from '../contexts/CurrentUserContext';
 function Main({
   onCardClick,
   onCardLike,
-  onCardDelete,
+  setCardDelete,
   onEditAvatar,
   onEditProfile,
   onAddPlace,
+  onConfirm,
   cards,
 }) {
   const currentUser = useContext(CurrentUserContext);
@@ -48,7 +49,8 @@ function Main({
               card={card}
               onCardClick={onCardClick}
               onCardLike={onCardLike}
-              onCardDelete={onCardDelete}
+              setCardDelete={setCardDelete}
+              onConfirm={onConfirm}
             />
           ))
         ) : (
