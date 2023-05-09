@@ -1,37 +1,62 @@
 import PopupWithForm from './PopupWithForm';
-import { useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
 function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
-  const ref = useRef();
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  const AvatarRef = useRef(null);
+  const {
+    register,
+    formState: { errors, isValid },
+    handleSubmit,
+    reset,
+  } = useForm({
+    mode: 'onChange',
+  });
+
+  const { ref, ...rest } = register('link', {
+    required: 'Обязательное поле',
+    pattern: {
+      value:
+        /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/,
+      message: 'Введите URL',
+    },
+  });
+
+  function onSubmit() {
+    setIsLoading(true);
     onUpdateAvatar({
-      link: ref.current.value,
+      link: AvatarRef.current.value,
     });
   }
 
   useEffect(() => {
-    ref.current.value = null;
-  }, [isOpen]);
+    setIsLoading(false);
+    reset();
+  }, [isOpen, reset]);
   return (
     <PopupWithForm
       title="Обновить аватар"
       name="edit-avatar"
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
+      isValid={isValid}
+      isLoading={isLoading}
     >
       <input
-        ref={ref}
+        {...rest}
+        ref={(e) => {
+          ref(e);
+          AvatarRef.current = e;
+        }}
         className="popup__text"
-        type="url"
-        name="link"
-        id="link"
         placeholder="Ссылка на картинку"
-        required
       />
-      <span className="popup__text-error link-error"></span>
+      <span className="popup__text-error link-error">
+        {errors?.link && (errors?.link?.message || 'error')}
+      </span>
     </PopupWithForm>
   );
 }

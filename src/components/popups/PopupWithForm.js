@@ -5,6 +5,8 @@ function PopupWithForm({
   isOpen,
   onClose,
   onSubmit,
+  isValid,
+  isLoading,
   children,
 }) {
   return (
@@ -22,8 +24,8 @@ function PopupWithForm({
         <h2 className="popup__title">{title}</h2>
         <form className="popup__form" name={name} onSubmit={onSubmit}>
           {children}
-          <button className="popup__submit" type="submit">
-            {buttonText || 'Сохранить'}
+          <button className="popup__submit" type="submit" disabled={!isValid}>
+            {isLoading ? 'Сохранение...' : buttonText || 'Сохранить'}
           </button>
         </form>
       </div>

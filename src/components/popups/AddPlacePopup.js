@@ -1,12 +1,19 @@
 import PopupWithForm from './PopupWithForm';
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
 function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
-  const [name, setName] = useState('');
-  const [link, setLink] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  const {
+    register,
+    formState: { errors, isValid },
+    handleSubmit,
+    reset,
+  } = useForm({ mode: 'onChange' });
+
+  function onSubmit({ name, link }) {
+    setIsLoading(true);
 
     onAddPlace({
       name,
@@ -15,9 +22,10 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
   }
 
   useEffect(() => {
-    setName('');
-    setLink('');
-  }, [isOpen]);
+    setIsLoading(false);
+
+    reset();
+  }, [isOpen, reset]);
 
   return (
     <PopupWithForm
@@ -26,32 +34,43 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       buttonText="Создать"
       isOpen={isOpen}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
+      isValid={isValid}
+      isLoading={isLoading}
     >
       <input
+        {...register('name', {
+          required: 'Обязательное поле',
+          minLength: {
+            value: 2,
+            message: 'Поле должно содержать минимум 2 символа',
+          },
+          maxLength: {
+            value: 30,
+            message: 'Поле превышает максимальное кол-во символов',
+          },
+        })}
         className="popup__text"
-        type="text"
-        name="popup-place"
-        id="popup-place"
         placeholder="Название"
-        minLength="2"
-        maxLength="30"
-        value={name}
-        onChange={(event) => setName(event.target.value)}
-        required
       />
-      <span className="popup__text-error popup-place-error"></span>
+      <span className="popup__text-error popup-place-error">
+        {errors?.name && (errors?.name?.message || 'error')}
+      </span>
       <input
+        {...register('link', {
+          required: 'Обязательное поле',
+          pattern: {
+            value:
+              /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-\/]))?/,
+            message: 'Введите URL',
+          },
+        })}
         className="popup__text"
-        type="url"
-        name="popup-link"
-        id="popup-link"
         placeholder="Ссылка на картинку"
-        value={link}
-        onChange={(event) => setLink(event.target.value)}
-        required
       />
-      <span className="popup__text-error popup-link-error"></span>
+      <span className="popup__text-error popup-link-error">
+        {errors?.link && (errors?.link?.message || 'error')}
+      </span>
     </PopupWithForm>
   );
 }
