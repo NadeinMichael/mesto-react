@@ -18,4 +18,4 @@ _use functional components_
 
 # Link on gh-pages :
 
-https://vladtolmachev.github.io/mesto-react/
+https://nadeinmichael.github.io/mesto-react/
